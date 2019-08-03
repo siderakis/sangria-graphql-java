@@ -3,7 +3,7 @@
 
 Modify the sangria playground to using GraphQL-Java for query execution with minimal changes to the schema creation code.
 
-1. Print schema (all types, enums, scalars, etc), without the resolvers (can't execute a query).
+1. [WIP] Print schema (all types, enums, scalars, etc), without the resolvers (can't execute a query).
 2. Try to implement the resolvers. Probably Fail. Learn.
 3. Fork sangria to just the schema creation code.
 4. Replace Action class with a light weight resolvers function.
@@ -13,6 +13,15 @@ Modify the sangria playground to using GraphQL-Java for query execution with min
 
 Open questions: Relay support.
 
+### Compare rendered schema
+```bash
+$ git clone https://github.com/siderakis/sangria-graphql-java.git
+$ cd sangria-graphql-java/sangria-playground
+$ sbt run
+```
+
+Sangria schema rendered: http://localhost:9000/render-schema
+GraphQL-Java schema rendered: http://localhost:9000/render-java-schema
 
 ## Original doc
 ### Sangria playground
