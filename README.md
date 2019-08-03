@@ -20,8 +20,157 @@ $ cd sangria-graphql-java/sangria-playground
 $ sbt run
 ```
 
-Sangria schema rendered: http://localhost:9000/render-schema
-GraphQL-Java schema rendered: http://localhost:9000/render-java-schema
+ - Sangria schema rendered: http://localhost:9000/render-schema
+ - GraphQL-Java schema rendered: http://localhost:9000/render-java-schema
+
+#### Sangria Schema
+
+```
+"A character in the Star Wars Trilogy"
+interface Character {
+  "The id of the character."
+  id: String!
+
+  "The name of the character."
+  name: String
+
+  "The friends of the character, or an empty list if they have none."
+  friends: [Character!]!
+
+  "Which movies they appear in."
+  appearsIn: [Episode]
+}
+
+"A mechanical creature in the Star Wars universe."
+type Droid implements Character {
+  "The id of the droid."
+  id: String!
+
+  "The name of the droid."
+  name: String
+
+  "The friends of the droid, or an empty list if they have none."
+  friends: [Character!]!
+
+  "Which movies they appear in."
+  appearsIn: [Episode]
+
+  "The primary function of the droid."
+  primaryFunction: String
+}
+
+"One of the films in the Star Wars Trilogy"
+enum Episode {
+  "Released in 1977."
+  NEWHOPE
+
+  "Released in 1980."
+  EMPIRE
+
+  "Released in 1983."
+  JEDI
+}
+
+"A humanoid creature in the Star Wars universe."
+type Human implements Character {
+  "The id of the human."
+  id: String!
+
+  "The name of the human."
+  name: String
+
+  "The friends of the human, or an empty list if they have none."
+  friends: [Character!]!
+
+  "Which movies they appear in."
+  appearsIn: [Episode]
+
+  "The home planet of the human, or null if unknown."
+  homePlanet: String
+}
+
+type Query {
+  hero(
+    "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode."
+    episode: Episode): Character! @deprecated(reason: "Use `human` or `droid` fields instead")
+  human(
+    "id of the character"
+    id: String!): Human
+  droid(
+    "id of the character"
+    id: String!): Droid!
+}
+
+```
+#### Sangria-GraphQL-Java Schema
+
+```
+#A character in the Star Wars Trilogy
+interface Character {
+  #Which movies they appear in.
+  appearsIn: [Episode]
+  #The friends of the character, or an empty list if they have none.
+  friends: [Character]
+  #The id of the character.
+  id: String!
+  #The name of the character.
+  name: String
+}
+
+#A mechanical creature in the Star Wars universe.
+type Droid implements Character {
+  #Which movies they appear in.
+  appearsIn: [Episode]
+  #The friends of the character, or an empty list if they have none.
+  friends: [Character]
+  #The id of the character.
+  id: String!
+  #The name of the character.
+  name: String
+  #The primary function of the droid.
+  primaryFunction: String
+}
+
+#A humanoid creature in the Star Wars universe.
+type Human implements Character {
+  #Which movies they appear in.
+  appearsIn: [Episode]
+  #The friends of the character, or an empty list if they have none.
+  friends: [Character]
+  #The home planet of the human, or null if unknown.
+  homePlanet: String
+  #The id of the character.
+  id: String!
+  #The name of the character.
+  name: String
+}
+
+type Query {
+  droid(
+    #id of the character
+    id: String!
+  ): Droid
+  hero(
+    #If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.
+    episode: Episode
+  ): Character
+  human(
+    #id of the character
+    id: String!
+  ): Human
+}
+
+#One of the films in the Star Wars Trilogy
+enum Episode {
+  #Released in 1980.
+  EMPIRE
+  #Released in 1983.
+  JEDI
+  #Released in 1977.
+  NEWHOPE
+}
+```
+
 
 ## Original doc
 ### Sangria playground
