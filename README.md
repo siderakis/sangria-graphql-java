@@ -1,4 +1,21 @@
-## Sangria playground
+
+## Roadmap
+
+Modify the sangria playground to using GraphQL-Java for query execution with minimal changes to the schema creation code.
+
+1. Print schema (all types, enums, scalars, etc), without the resolvers (can't execute a query).
+2. Try to implement the resolvers. Probably Fail. Learn.
+3. Fork sangria to just the schema creation code.
+4. Replace Action class with a light weight resolvers function.
+5. Get sample fully working with new fork.
+6. Publish forked code as a new library.
+
+
+Open questions: Relay support.
+
+
+## Original doc
+### Sangria playground
 
 This is an example of a [GraphQL](https://facebook.github.io/graphql) server written with [Play framework](https://www.playframework.com) and
 [Sangria](http://sangria-graphql.org). It also serves as a playground. On the right hand side you can see a textual representation of the GraphQL
