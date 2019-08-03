@@ -10,6 +10,7 @@ libraryDependencies ++= Seq(
   filters,
   "org.sangria-graphql" %% "sangria" % "1.4.2",
   "org.sangria-graphql" %% "sangria-slowlog" % "0.1.8",
+  "com.graphql-java" % "graphql-java" % "13.0",
   "org.sangria-graphql" %% "sangria-play-json" % "1.0.4",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test")
 

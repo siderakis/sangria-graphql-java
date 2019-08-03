@@ -2,6 +2,8 @@ package controllers
 
 import javax.inject.Inject
 import akka.actor.ActorSystem
+import graphql.schema._
+import graphql.schema.idl.SchemaPrinter
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.Configuration
@@ -11,19 +13,22 @@ import sangria.marshalling.playJson._
 import models.{CharacterRepo, SchemaDefinition}
 import sangria.execution.deferred.DeferredResolver
 import sangria.renderer.SchemaRenderer
+import sangria.schema.{Action, ObjectType, Schema}
 import sangria.slowlog.SlowLog
+import sangriatographqljava.SchemaConverter
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Application @Inject() (system: ActorSystem, config: Configuration) extends InjectedController {
+class Application @Inject()(system: ActorSystem, config: Configuration) extends InjectedController {
+
   import system.dispatcher
 
   val googleAnalyticsCode = config.getOptional[String]("gaCode")
   val defaultGraphQLUrl = config.getOptional[String]("defaultGraphQLUrl").getOrElse(s"http://localhost:${config.getOptional[Int]("http.port").getOrElse(9000)}/graphql")
 
   def index = Action {
-    Ok(views.html.index(googleAnalyticsCode,defaultGraphQLUrl))
+    Ok(views.html.index(googleAnalyticsCode, defaultGraphQLUrl))
   }
 
   def playground = Action {
@@ -56,14 +61,14 @@ class Application @Inject() (system: ActorSystem, config: Configuration) extends
       // query parsed successfully, time to execute it!
       case Success(queryAst) ⇒
         Executor.execute(SchemaDefinition.StarWarsSchema, queryAst, new CharacterRepo,
-            operationName = operation,
-            variables = variables getOrElse Json.obj(),
-            deferredResolver = DeferredResolver.fetchers(SchemaDefinition.characters),
-            exceptionHandler = exceptionHandler,
-            queryReducers = List(
-              QueryReducer.rejectMaxDepth[CharacterRepo](15),
-              QueryReducer.rejectComplexQueries[CharacterRepo](4000, (_, _) ⇒ TooComplexQueryError)),
-            middleware = if (tracing) SlowLog.apolloTracing :: Nil else Nil)
+          operationName = operation,
+          variables = variables getOrElse Json.obj(),
+          deferredResolver = DeferredResolver.fetchers(SchemaDefinition.characters),
+          exceptionHandler = exceptionHandler,
+          queryReducers = List(
+            QueryReducer.rejectMaxDepth[CharacterRepo](15),
+            QueryReducer.rejectComplexQueries[CharacterRepo](4000, (_, _) ⇒ TooComplexQueryError)),
+          middleware = if (tracing) SlowLog.apolloTracing :: Nil else Nil)
           .map(Ok(_))
           .recover {
             case error: QueryAnalysisError ⇒ BadRequest(error.resolveError)
@@ -88,10 +93,15 @@ class Application @Inject() (system: ActorSystem, config: Configuration) extends
     Ok(SchemaRenderer.renderSchema(SchemaDefinition.StarWarsSchema))
   }
 
+  def renderJavaSchema = Action {
+    Ok(new SchemaPrinter().print(SchemaConverter.scalaToJavaSchema(SchemaDefinition.StarWarsSchema)))
+  }
+
   lazy val exceptionHandler = ExceptionHandler {
-    case (_, error @ TooComplexQueryError) ⇒ HandledException(error.getMessage)
-    case (_, error @ MaxQueryDepthReachedError(_)) ⇒ HandledException(error.getMessage)
+    case (_, error@TooComplexQueryError) ⇒ HandledException(error.getMessage)
+    case (_, error@MaxQueryDepthReachedError(_)) ⇒ HandledException(error.getMessage)
   }
 
   case object TooComplexQueryError extends Exception("Query is too expensive.")
+
 }
